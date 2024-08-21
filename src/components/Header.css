@@ -1,0 +1,27 @@
+/* .header {
+  background-color: #000;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+} */
+.header {
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center items vertically */
+  padding: 10px 20px; /* Add some padding */
+  background-color: #000; /* Black background */
+  color: #fff; /* White text color */
+  position: relative; /* Ensure positioning of the logo */
+}
+
+.title {
+  text-align: center;
+  flex: 1; /* Allow title to take up available space */
+}
+
+.logo {
+  position: absolute; /* Position logo absolutely */
+  right: 20px; /* Adjust distance from the right edge */
+  height: 50px; /* Adjust the height as needed */
+  width: auto; /* Maintain aspect ratio */
+}

@@ -1,0 +1,31 @@
+.user-table-container {
+  margin: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.icon {
+  cursor: pointer;
+  margin: 0 5px;
+  font-size: 18px;
+}
+
+.edit-icon {
+  color: #4CAF50; /* Green */
+}
+
+.save-icon {
+  color: #FFC107; /* Amber */
+}
+
+.delete-icon {
+  color: #F44336; /* Red */
+}
