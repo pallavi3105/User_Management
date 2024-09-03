@@ -1,0 +1,40 @@
+.dashboard-container {
+    padding: 20px;
+  }
+  
+  .cards-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .card {
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    flex: 1;
+    margin-right: 10px;
+    color: white;
+  }
+  
+  .card:last-child {
+    margin-right: 0;
+  }
+  
+  /* Custom colors for each card */
+  .card:nth-child(1) {
+    background-color: #4caf50; /* Green for Total Users */
+  }
+  
+  .card:nth-child(2) {
+    background-color: #2196f3; /* Blue for Active Users */
+  }
+  
+  .card:nth-child(3) {
+    background-color: #f44336; /* Red for Inactive Users */
+  }
+  
+  .user-form-container {
+    margin-top: 20px;
+  }
+  

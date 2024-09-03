@@ -1,22 +1,7 @@
-// import React from 'react';
-// import './Sidebar.css';
-
-// const Sidebar = () => {
-//   return (
-//     <aside className="sidebar">
-//       <ul>
-//         <li><a href="#dashboard">Dashboard</a></li>
-//         <li><a href="#users">Users</a></li>
-//         <li><a href="#settings">Settings</a></li>
-//       </ul>
-//     </aside>
-//   );
-// };
-
-// export default Sidebar;
 // import React, { useState } from 'react';
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 // import { faBars, faTachometerAlt, faUsers, faCog } from '@fortawesome/free-solid-svg-icons';
+// import { Link } from 'react-router-dom';
 // import './Sidebar.css';
 
 // const Sidebar = () => {
@@ -33,16 +18,22 @@
 //       </div>
 //       <ul className="sidebar-menu">
 //         <li>
-//           <FontAwesomeIcon icon={faTachometerAlt} />
-//           <span className="menu-text">Dashboard</span>
+//           <Link to="/">
+//             <FontAwesomeIcon icon={faTachometerAlt} />
+//             <span className="menu-text">Dashboard</span>
+//           </Link>
 //         </li>
 //         <li>
-//           <FontAwesomeIcon icon={faUsers} />
-//           <span className="menu-text">Users</span>
+//           <Link to="/user-table">
+//             <FontAwesomeIcon icon={faUsers} />
+//             <span className="menu-text">Users</span>
+//           </Link>
 //         </li>
 //         <li>
-//           <FontAwesomeIcon icon={faCog} />
-//           <span className="menu-text">Settings</span>
+//           <Link to="/settings">
+//             <FontAwesomeIcon icon={faCog} />
+//             <span className="menu-text">Settings</span>
+//           </Link>
 //         </li>
 //       </ul>
 //     </div>
@@ -50,7 +41,6 @@
 // };
 
 // export default Sidebar;
-
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTachometerAlt, faUsers, faCog } from '@fortawesome/free-solid-svg-icons';

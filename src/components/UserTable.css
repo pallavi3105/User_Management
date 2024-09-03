@@ -1,5 +1,5 @@
 .user-table-container {
-  margin: 20px;
+  padding: 20px;
 }
 
 table {
@@ -10,22 +10,50 @@ table {
 th, td {
   padding: 10px;
   border: 1px solid #ddd;
+  text-align: left;
 }
 
-.icon {
+th {
+  background-color: #f4f4f4;
+}
+
+.action-menu {
+  position: relative;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
   cursor: pointer;
-  margin: 0 5px;
   font-size: 18px;
+  color: #333;
 }
 
-.edit-icon {
-  color: #4CAF50; /* Green */
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+  z-index: 10;
 }
 
-.save-icon {
-  color: #FFC107; /* Amber */
+.menu-options button {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.delete-icon {
-  color: #F44336; /* Red */
+.menu-options button:hover {
+  background: #f0f0f0;
+}
+
+.menu-options button svg {
+  margin-right: 8px;
 }
