@@ -1,40 +1,45 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // Import path module to serve the React build
 const { Pool } = require('pg');
 const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer'); // Add nodemailer
+const nodemailer = require('nodemailer');
 const app = express();
-const port = 5000;
+require('dotenv').config();
+const port = process.env.PORT || 5000;
 
 const pool = new Pool({
-  user: 'user_it',
-  host: '192.168.1.91',
-  database: 'DEV',
-  password: 'Qawsed*&^%',
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
+// Serve the static files from the React app
+app.use(express.static(path.join(__dirname, 'build'))); 
+
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
 // Email transporter configuration
 const transporter = nodemailer.createTransport({
-  host: 'smtpout.secureserver.net', // GoDaddy SMTP server
-  port: 465, // Secure port for SMTP
-  secure: true, // Use TLS
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: process.env.EMAIL_SECURE === 'true',
   auth: {
-    user: 'pallavi.a@quantasip.com', // Replace with your GoDaddy email
-    pass: 'Pallavi@24', // Replace with your GoDaddy email password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
 // Function to send email
 const sendEmail = (user) => {
   const mailOptions = {
-    from: 'pallavi.a@quantasip.com', // Sender address
+    from: process.env.EMAIL_USER, // Sender address
     to: user.emailid, // List of recipients
     subject: 'Your User Account Details', // Subject line
-    text: `Dear ${user.username},\n\nYour account has been created.\n\nUser ID: ${user.userid}\nPassword: ${user.password}\n\nThank you!\nTeam`, // Plain text body
+    text: `Dear ${user.username},\n\nYour account has been created.\n\nUser ID: ${user.userid}\nPassword: ${user.password}\n\nThank you!\nTeam`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -44,7 +49,6 @@ const sendEmail = (user) => {
     console.log('Email sent:', info.response);
   });
 };
-
 
 // Fetch schemas
 app.get('/api/schemas', async (req, res) => {
@@ -107,33 +111,31 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Add a new user
-
 app.post('/api/users', async (req, res) => {
   const user = req.body;
   console.log('Received user data:', user);
 
   const query = `
-  INSERT INTO "UserData".users (
-    vendor,
-    username,
-    userid,
-    password,
-    employeecode,
-    state,
-    role,
-    useractivity,
-    contactno,
-    userip,
-    emailid,
-    joiningdate,
-    activeindex,
-    schema,
-    table_name
-  )
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-  RETURNING *;
-`;
-
+    INSERT INTO "UserData".users (
+      vendor,
+      username,
+      userid,
+      password,
+      employeecode,
+      state,
+      role,
+      useractivity,
+      contactno,
+      userip,
+      emailid,
+      joiningdate,
+      activeindex,
+      schema,
+      table_name
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+    RETURNING *;
+  `;
 
   try {
     const result = await pool.query(query, [
@@ -161,12 +163,9 @@ app.post('/api/users', async (req, res) => {
     res.status(201).json({ message: 'User added and email sent', user: result.rows[0] });
   } catch (error) {
     console.error('Error adding user:', error);
-
-    // Send detailed error message
     res.status(500).json({ error: error.message });
   }
 });
-
 
 // Update an existing user
 app.put('/api/users/:id', async (req, res) => {
@@ -209,7 +208,8 @@ app.put('/api/users/:id', async (req, res) => {
       user.table_name,
       userId
     ]);
-    res.json({ message: 'User updated' });
+    sendEmail(user); // Send an email after user update
+    res.json({ message: 'User updated and email sent' });
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ error: 'Error updating user' });
@@ -231,6 +231,70 @@ app.delete('/api/users/:userid', async (req, res) => {
   }
 });
 
+// New API to fetch data by joining user_sessions and user_access
+app.get('/api/user-sessions-access', async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        us.user_id, us.username,us.ip_address, us.login_time, us.logout_time, 
+        ua.access_type, ua.file_name, ua.access_time, ua.access_duration, ua.lgd_code
+      FROM user_sessions us
+      JOIN user_access ua ON us.user_id = ua.u_id
+    `;
+    const result = await pool.query(query);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching user sessions and access data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/users/:userid/actions', async (req, res) => {
+  const userId = req.params.userid;
+  const { date } = req.query;  // Expecting a 'date' query parameter
+
+  console.log('User ID:', userId);
+  console.log('Date:', date);
+
+  try {
+    const query = `
+      SELECT 
+        us.user_id, 
+        us.username, 
+        us.ip_address, 
+        us.login_time, 
+        us.logout_time, 
+        ua.access_type, 
+        ua.file_name, 
+        ua.access_time, 
+        ua.access_duration
+      FROM 
+        "UserData".user_sessions us
+      LEFT JOIN 
+        "UserData".user_access ua 
+      ON 
+        us.user_id = ua.user_id
+      WHERE 
+        us.user_id = 242
+        AND DATE(ua.access_time) = '2023-09-26'
+    `;
+
+    const values = [userId, date];  // Pass user ID and date as parameters
+    const result = await pool.query(query, values);  // Execute query using your DB connection
+    res.json(result.rows);  // Return the rows as JSON
+  } catch (error) {
+    console.error('Error fetching user actions:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '/build/index.html'));
+});
+
 app.listen(port, () => {
-  console.log(`API server running on http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
